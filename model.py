@@ -1,17 +1,15 @@
-import argparse
 import torch
-import numpy as np
-import torchvision.transforms as transforms
-import torch.nn as nn
-import torch.optim as optim
-from torchvision.models import efficientnet_b3
-import torch.nn.functional as F
 
-import sys
+best_model = torch.load("bestmodel.pt")
 
-data_folder = 'data/'
-# Define any image preprocessing steps you want to apply
-transform = transforms.Compose([
-    transforms.Resize((224,224)),
-    transforms.ToTensor()
-])
+# NCHW (batch size, number of channels, height, width).
+x = torch.randn(15, 3, 224, 224, requires_grad=True).cuda()
+
+torch.onnx.export(best_model,
+                 x,
+                 "bestmodel.onnx",
+                 verbose=False,
+                 input_names=["actual_input"],
+                 output_names=["output"],
+                 export_params=True,
+                 )
